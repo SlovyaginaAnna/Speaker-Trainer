@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">SpeakerTrainer</string>
+    <string name="authorization">Войти</string>
+    <string name="enterPassword">Введите пароль</string>
+    <string name="enterEmail">Введите почту</string>
+    <string name="authorizationText">Авторизация</string>
+    <string name="registrationText">Регистрация</string>
+    <string name="registerText">Зарегестрироваться</string>
+    <string name="passwordAgainText">Повторите пароль</string>
+    <string name="passwordRecoveryText">Восстановление пароля</string>
+    <string name="nextText">Далее</string>
+    <string name="LoadVideoText">Загрузить видео</string>
+    <string name="StartVideoText">Начать запись</string>
+    <string name="RecomendationsText">Рекомендации</string>
+    <string name="ArchiveText">Архив</string>
+    <string name="mustFillField">Поле должно быть заполнено</string>
+    <string name="exit">Выход</string>
+    <string name="archieve">архив</string>
+    <string name="home">домой</string>
+    <string name="back">вернуться</string>
+</resources>
