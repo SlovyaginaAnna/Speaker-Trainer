@@ -3,22 +3,27 @@ package com.app.speakertrainer.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.app.speakertrainer.R
-import com.app.speakertrainer.constance.Constance
 import com.app.speakertrainer.data.RecommendationsInfo
 import com.app.speakertrainer.databinding.ActivityRecomendationsBinding
+import com.app.speakertrainer.modules.ApiManager
 import com.app.speakertrainer.modules.Client
-import com.google.gson.Gson
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.Response
-import java.io.IOException
 
+/**
+ * Activity for representing recommendations.
+ */
 class Recommendations : AppCompatActivity() {
     private lateinit var binding: ActivityRecomendationsBinding
+    private val apiManager = ApiManager(this)
+
+    /**
+     * Method called when the activity is created.
+     * Initializes the binding to the layout and displays it on the screen.
+     * Call method that sets statistics.
+     *
+     * @param savedInstanceState a Bundle object containing the previous state of the activity (if saved)
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRecomendationsBinding.inflate(layoutInflater)
@@ -36,38 +41,19 @@ class Recommendations : AppCompatActivity() {
         getRecommendationsInfo()
     }
 
+    /**
+     * Post request to get recommendations from server.
+     */
     private fun getRecommendationsInfo() {
-        val requestBody = FormBody.Builder()
-            .add("token", Client.token)
-            .build()
-        Client.client.postRequest("recommendations/", requestBody, object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                toastResponse("Ошибка соединения")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    if (response.header("status") == Constance.UNKNOWN_ERROR) {
-                        toastResponse("Ошибка загрузки файла. Пользователь не найден")
-                    } else {
-                        val gson = Gson()
-                        val info = gson.fromJson(
-                            response.body?.string(),
-                            RecommendationsInfo::class.java
-                        )
-                        setInfo(info)
-                    }
-                } else toastResponse("Ошибка загрузки информации")
-            }
-        })
-    }
-
-    fun toastResponse(text: String) {
-        runOnUiThread {
-            Toast.makeText(this@Recommendations, text, Toast.LENGTH_SHORT).show()
+        apiManager.getRecommendations { info ->
+            setInfo(info)
         }
     }
 
+    /**
+     * Set the fields of the [info] to the corresponding text views
+     * and make corresponding text views visible.
+     */
     private fun setInfo(info: RecommendationsInfo) {
         runOnUiThread {
             binding.apply {

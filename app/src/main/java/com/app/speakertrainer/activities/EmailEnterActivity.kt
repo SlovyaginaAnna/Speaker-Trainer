@@ -3,61 +3,57 @@ package com.app.speakertrainer.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.app.speakertrainer.R
-import com.app.speakertrainer.constance.Constance
 import com.app.speakertrainer.databinding.ActivityEmailEnterBinding
-import com.app.speakertrainer.modules.Client
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.Response
-import java.io.IOException
+import com.app.speakertrainer.modules.ApiManager
 
+/**
+ * Activity for entering email to change password.
+ */
 class EmailEnterActivity : AppCompatActivity() {
     private lateinit var bindingClass: ActivityEmailEnterBinding
     private var numbers: String? = null
     private var email: String? = null
+    private val apiManager = ApiManager(this)
 
+    /**
+     * Method called when the activity is created.
+     * Initializes the binding to the layout and displays it on the screen.
+     *
+     * @param savedInstanceState a Bundle object containing the previous state of the activity (if saved)
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindingClass = ActivityEmailEnterBinding.inflate(layoutInflater)
         setContentView(bindingClass.root)
     }
 
+    /**
+     * Method starts authorization activity.
+     */
     fun onClickAuthorization(view: View) {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    /**
+     * Method post request for getting numbers to check email.
+     */
     fun onClickSendCode(view: View) {
         if (!isFieldEmpty()) {
             email = bindingClass.emailInput.text.toString()
-            val requestBody = FormBody.Builder()
-                .add("email", email.toString())
-                .build()
-            Client.client.postRequest("password_recovery/", requestBody, object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    toastResponse("Ошибка соединения" + e.message)
-                }
+            apiManager.getEmailCheckNumbers(email!!) { num ->
+                numbers = num
 
-                override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body
-                    if (response.isSuccessful) {
-                        if (response.header("status") == Constance.EMAIL_REGISTERED) {
-                            numbers = responseBody?.string()
-                            toastResponse("Письмо отправлено на почту")
-                        } else {
-                            toastResponse("Неверная почта")
-                        }
-                    } else toastResponse("Неизвестная ошибка. Попробуйте позже")
-                }
-            })
+            }
         }
     }
 
+    /**
+     * Method opens activity for inputting new password if all data is correct.
+     */
     fun onClickNext(view: View) {
         if (!isNumEmpty() && numbers != null) {
             if (bindingClass.numInput.text.toString() == numbers) {
@@ -69,12 +65,12 @@ class EmailEnterActivity : AppCompatActivity() {
         }
     }
 
-    fun toastResponse(text: String) {
-        runOnUiThread {
-            Toast.makeText(this@EmailEnterActivity, text, Toast.LENGTH_SHORT).show()
-        }
-    }
-
+    /**
+     * Method checks if email input text is not empty.
+     * If field is empty method set error.
+     *
+     * @return is email input field is empty.
+     */
     private fun isFieldEmpty(): Boolean {
         bindingClass.apply {
             if (emailInput.text.isNullOrEmpty()) emailInput.error =
@@ -83,6 +79,12 @@ class EmailEnterActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method checks if field for numbers is empty.
+     * If field is empty method set error.
+     *
+     * @return is number input field is empty.
+     */
     private fun isNumEmpty(): Boolean {
         bindingClass.apply {
             if (numInput.text.isNullOrEmpty()) numInput.error =

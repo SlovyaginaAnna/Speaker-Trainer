@@ -1,4 +1,6 @@
 package com.app.speakertrainer.data
 
-// Data containing some info of one file.
+/**
+ * Data class containing filename and datetime when video record was sent to server.
+ */
 data class FileInfo(val filename: String, val datetime: String)

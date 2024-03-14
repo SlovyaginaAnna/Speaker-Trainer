@@ -9,10 +9,19 @@ import com.app.speakertrainer.databinding.ActivityPreviewVideoBinding
 import com.app.speakertrainer.modules.Client
 import com.app.speakertrainer.modules.RecordAdapter
 
+/**
+ * Activity for displaying archive.
+ */
 class PreviewVideoActivity : AppCompatActivity() {
     lateinit var binding: ActivityPreviewVideoBinding
     private val adapter = RecordAdapter()
 
+    /**
+     * Method called when the activity is created.
+     * Initializes the binding to the layout and displays it on the screen.
+     *
+     * @param savedInstanceState a Bundle object containing the previous state of the activity (if saved)
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPreviewVideoBinding.inflate(layoutInflater)
@@ -20,6 +29,9 @@ class PreviewVideoActivity : AppCompatActivity() {
         init()
     }
 
+    /**
+     * Method fills adapter for displaying record list.
+     */
     private fun init() {
         binding.apply {
             rcView.layoutManager = LinearLayoutManager(this@PreviewVideoActivity)
@@ -29,7 +41,7 @@ class PreviewVideoActivity : AppCompatActivity() {
                     val intent = Intent(this@PreviewVideoActivity, AnalysisResults::class.java)
                     intent.putExtra("index", position.toString())
                     startActivity(intent)
-                    //finish()
+                    finish()
                 }
             })
             for (item in Client.recordList) {
@@ -38,6 +50,9 @@ class PreviewVideoActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Open home screen activity.
+     */
     fun onClickHome(view: View) {
         val intent = Intent(this, Home::class.java)
         startActivity(intent)

@@ -1,6 +1,8 @@
 package com.app.speakertrainer.data
 
-// Data class containing recommendations after analysing.
+/**
+ * Data class containing recommendations after analysing.
+ */
 data class RecommendationsInfo(
     val clean_speech: String?,
     val speech_rate: String?,

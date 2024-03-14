@@ -1,6 +1,8 @@
 package com.app.speakertrainer.data
 
-// Data class containing analysis results.
+/**
+ * Data class containing analysis results.
+ */
 data class ResponseResults(
     val clean_speech: String?,
     val speech_rate: String?,

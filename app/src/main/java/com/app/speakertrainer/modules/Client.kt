@@ -9,7 +9,9 @@ import com.app.speakertrainer.data.Record
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieEntry
 
-// This Class contains the `Client` object which holds network client, data, and text entries.
+/**
+ * This Class contains the `Client` object which holds network client, data, and text entries.
+ */
 object Client {
     val client: NetworkClient = NetworkClient()
     var token: String = ""
@@ -26,7 +28,9 @@ object Client {
     var pieText = "Здесь будет отображаться ваш прогресс. Пример"
     var lineText = "Здесь будет отображаться ваш прогресс. Пример"
 
-    // The `resetData` function resets all the data fields to their initial values.
+    /**
+     * The `resetData` function resets all the data fields to their initial values.
+     */
     fun resetData() {
         token = ""
         recordList = ArrayList<Record>()
@@ -43,7 +47,12 @@ object Client {
         lineText = "Здесь будет отображаться ваш прогресс. Пример"
     }
 
-    // The `setCustomString` function creates a SpannableString with custom typefaces for different parts.
+    /**
+     * The `setCustomString` function creates a SpannableString with custom typefaces for different parts.
+     *
+     * @param boldText is string to make bold.
+     * @param regularText is string to concatenate with bold text.
+     */
     fun setCustomString(boldText: String, regularText: String, context: Context): SpannableString {
         val boldTypeface = ResourcesCompat.getFont(context, R.font.comfortaa_bold)
         val regularTypeface = ResourcesCompat.getFont(context, R.font.comfortaa_light)

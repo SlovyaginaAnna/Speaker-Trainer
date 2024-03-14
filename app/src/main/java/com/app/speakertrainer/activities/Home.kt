@@ -7,51 +7,39 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
-import com.app.speakertrainer.constance.Constance
 import com.app.speakertrainer.constance.Constance.REQUEST_VIDEO_CAPTURE
 import com.app.speakertrainer.data.Statistics
 import com.app.speakertrainer.databinding.ActivityHomeBinding
+import com.app.speakertrainer.modules.ApiManager
 import com.app.speakertrainer.modules.Client
 import com.app.speakertrainer.modules.Client.graphEntries
 import com.app.speakertrainer.modules.Client.lineGraphEntries
 import com.app.speakertrainer.modules.Client.pieEntries
-import com.app.speakertrainer.modules.Client.token
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.google.gson.Gson
 import com.gowtham.library.utils.LogMessage
 import com.gowtham.library.utils.TrimVideo
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.Response
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
-
+/**
+ * Activity that represents home screen.
+ */
 class Home : AppCompatActivity() {
     private lateinit var selectBtn: Button
     private lateinit var binding: ActivityHomeBinding
     private val PICK_IMAGE = 100
-    private val TRIM_VIDEO = 102
     private var videoUri: Uri? = null
+    private val apiManager = ApiManager(this)
     val startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK &&
@@ -67,6 +55,13 @@ class Home : AppCompatActivity() {
                 LogMessage.v("videoTrimResultLauncher data is null")
         }
 
+    /**
+     * Method called when the activity is created.
+     * Initializes the binding to the layout and displays it on the screen.
+     * Call method that sets statistics.
+     *
+     * @param savedInstanceState a Bundle object containing the previous state of the activity (if saved)
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -75,39 +70,28 @@ class Home : AppCompatActivity() {
         getStatistics()
     }
 
+    /**
+     * Post request to get arrays with values for graphs.
+     * Call methods for drawing charts.
+     */
     private fun getStatistics() {
         if (Client.recordList.size > 0) {
-            val requestBody = FormBody.Builder()
-                .add("token", token)
-                .build()
-            Client.client.postRequest("statistics/", requestBody, object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    toastResponse("Ошибка соединения")
-                    drawLineChart()
-                    drawPieChart()
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        if (response.header("status") != Constance.UNKNOWN_ERROR) {
-                            val gson = Gson()
-                            val statistics = gson.fromJson(
-                                response.body?.string(),
-                                Statistics::class.java
-                            )
-                            setGraphs(statistics)
-                        } else toastResponse("Ошибка загрузки статистики. Обратитесь в поддержку")
-                    } else toastResponse("Ошибка загрузки статистики")
-                    drawLineChart()
-                    drawPieChart()
-                }
-            })
+            apiManager.getGraphStatistics { statistics->
+                setGraphs(statistics)
+                drawLineChart()
+                drawPieChart()
+            }
         } else {
             drawLineChart()
             drawPieChart()
         }
     }
 
+    /**
+     * Method set entries values with data got from server.
+     *
+     * @param statistics a Statistics object which contains arrays of entries for drawing charts.
+     */
     private fun setGraphs(statistics: Statistics) {
         if (statistics.speech_rate != null) {
             graphEntries = ArrayList<Entry>()
@@ -137,12 +121,17 @@ class Home : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method set pie charts settings.
+     * Method draw pie chart.
+     */
     private fun drawPieChart() {
         runOnUiThread {
             val pieChart = binding.pieChart
             pieChart.setHoleColor(Color.parseColor("#13232C"))
             val entries = pieEntries
             val colors = mutableListOf<Int>()
+            // Set colors for drawing pie chart.
             for (i in entries.indices) {
                 val randomColor = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
                 colors.add(randomColor)
@@ -159,6 +148,10 @@ class Home : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method set line charts settings.
+     * Method draw line chart.
+     */
     private fun drawLineChart() {
         runOnUiThread {
             val lineChart = binding.lineChart
@@ -182,6 +175,9 @@ class Home : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method opens your phone files to choose video for analysing.
+     */
     fun onClickLoadVideo(view: View) {
         val intent = Intent()
         intent.action = Intent.ACTION_PICK
@@ -189,10 +185,17 @@ class Home : AppCompatActivity() {
         startActivityForResult(intent, PICK_IMAGE)
     }
 
+    /**
+     * Method opens video camera for recording video.
+     */
     fun onClickStartRecording(view: View) {
-        dispatchTakeVideoIntent()
+        val takeVideoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
     }
 
+    /**
+     * Method creates alert dialog to ensure in users actions.
+     */
     fun onClickExit(view: View) {
         val alertDialog = AlertDialog.Builder(this)
             .setTitle("Выход из аккаунта")
@@ -209,67 +212,29 @@ class Home : AppCompatActivity() {
         alertDialog.show()
     }
 
+    /**
+     * Method post request to logout and reset data.
+     * Return to authorization activity.
+     */
     private fun logoutUser() {
-        val requestBody = FormBody.Builder()
-            .add("token", token)
-            .build()
-        Client.client.postRequest("logout/", requestBody, object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                toastResponse("Ошибка соединения")
+        apiManager.logoutUser() {loggedOut ->
+            if (loggedOut) {
+                val intent = Intent(this@Home, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    if (response.header("status") == Constance.LOGOUT_SUCCESS) {
-                        val intent = Intent(this@Home, MainActivity::class.java)
-                        startActivity(intent)
-                        Client.resetData()
-                        finish()
-                    } else {
-                        toastResponse("Неизвестная ошибка. Свяжитесь с тех. поддержкой")
-                    }
-                } else toastResponse("Неизвестная ошибка. Повторите позже")
-            }
-        })
-    }
-
-    fun toastResponse(text: String) {
-        runOnUiThread {
-            Toast.makeText(this@Home, text, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun createVideoFile(): File {
-        val timeStamp: String = SimpleDateFormat(
-            "yyyyMMdd_HHmmss",
-            Locale.getDefault()
-        ).format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_MOVIES)
-        return File.createTempFile(
-            "VIDEO_${timeStamp}_",
-            ".mp4",
-            storageDir
-        )
-    }
-
-    private fun dispatchTakeVideoIntent() {
-        val takeVideoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
-    }
-
-    private fun startRecording() {
-        val videoFile = createVideoFile()
-        videoUri = Uri.fromFile(videoFile)
-
-        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri)
-
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivityForResult(intent, REQUEST_VIDEO_CAPTURE)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
+    /**
+     * Method called when receiving the result from another activity.
+     * Handles the result based on the request code and result code.
+     *
+     * @param requestCode the request code that was originally sent when starting the activity
+     * @param resultCode the result code returned by the activity
+     * @param data the data intent passed back by the activity (may be null)
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             if (data != null) {
@@ -287,6 +252,9 @@ class Home : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method starts trim video activity.
+     */
     private fun trimVideo(videoUri: String?) {
         TrimVideo.activity(videoUri)
             .setHideSeekBar(true)
@@ -294,13 +262,19 @@ class Home : AppCompatActivity() {
     }
 
 
+    /**
+     * Method open archieve and finish home activity.
+     */
     fun onClickArchieve(view: View) {
         val intent = Intent(this, PreviewVideoActivity::class.java)
         startActivity(intent)
         finish()
     }
 
-    fun onClickRecommendations(vie: View) {
+    /**
+     * Method open recommendations and finish home activity.
+     */
+    fun onClickRecommendations(view: View) {
         val intent = Intent(this, Recommendations::class.java)
         startActivity(intent)
         finish()

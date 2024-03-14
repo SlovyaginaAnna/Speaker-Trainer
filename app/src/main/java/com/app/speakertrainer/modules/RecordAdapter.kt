@@ -8,10 +8,14 @@ import com.app.speakertrainer.R
 import com.app.speakertrainer.data.Record
 import com.app.speakertrainer.databinding.RecordItemBinding
 
-// The `RecordAdapter` class is an adapter for displaying records in a RecyclerView.
+/**
+ * Class is an adapter for displaying records in a RecyclerView.
+ */
 class RecordAdapter : RecyclerView.Adapter<RecordAdapter.RecordHolder>() {
 
-    // It includes an interface for item click events and a ViewHolder inner class to bind data to views.
+    /**
+     * It includes an interface for item click events and a ViewHolder inner class to bind data to views.
+     */
     interface onItemClickListener {
         fun onItemClick(position: Int)
     }
@@ -19,14 +23,29 @@ class RecordAdapter : RecyclerView.Adapter<RecordAdapter.RecordHolder>() {
     val recordList = ArrayList<Record>()
     private lateinit var mListener: onItemClickListener
 
+    /**
+     * Class for setting records to corresponded binding.
+     *
+     * @param item a View to set elements.
+     * @param listener a listener to click on item event.
+     */
     class RecordHolder(item: View, listener: onItemClickListener) : RecyclerView.ViewHolder(item) {
         val binding = RecordItemBinding.bind(item)
+
+        /**
+         * Method binds record.
+         *
+         * @param record a record to bind.
+         */
         fun bind(record: Record) = with(binding) {
             im.setImageBitmap(record.image)
             tvName.text = record.title
             tvDate.text = record.date
         }
 
+        /**
+         * Set click listener.
+         */
         init {
             itemView.setOnClickListener {
                 listener.onItemClick(adapterPosition)
@@ -34,27 +53,50 @@ class RecordAdapter : RecyclerView.Adapter<RecordAdapter.RecordHolder>() {
         }
     }
 
-    // The `onCreateViewHolder` method inflates the layout for each item in the RecyclerView.
+    /**
+     * Method inflates the layout for each item in the RecyclerView.
+     *
+     * @param parent a ViewGroup to get context from.
+     * @param viewType an Int value used for identifying the type of view to be created.
+     * @return a RecordHolder instance associated with the inflated view.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.record_item, parent, false)
         return RecordHolder(view, mListener)
     }
 
+    /**
+     * Gets number of records in recordList.
+     */
     override fun getItemCount(): Int {
         return recordList.size
     }
 
-    // The `onBindViewHolder` method binds data to the ViewHolder.
+    /**
+     * Method binds data to the ViewHolder.
+     *
+     * @param holder a RecordHolder to bind element.
+     * @param position a Int index of recordList element to bind.
+     */
     override fun onBindViewHolder(holder: RecordHolder, position: Int) {
         holder.bind(recordList[position])
     }
 
-    // The adapter also provides methods to add records, set item click listeners, and notify data changes.
+    /**
+     * Method adds record to recordList.
+     *
+     * @param record a record to add to reordList.
+     */
     fun addRecord(record: Record) {
         recordList.add(record)
         notifyDataSetChanged()
     }
 
+    /**
+     * Method set click listener to items.
+     *
+     * @param listener a listener to notify item click events.
+     */
     fun setOnItemClickListener(listener: onItemClickListener) {
         mListener = listener
     }
