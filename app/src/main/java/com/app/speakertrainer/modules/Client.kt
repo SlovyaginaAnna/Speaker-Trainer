@@ -1,6 +1,7 @@
 package com.app.speakertrainer.modules
 
 import android.content.Context
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import androidx.core.content.res.ResourcesCompat
@@ -17,7 +18,7 @@ object Client {
     var token: String = ""
     var graphEntries = arrayListOf(
         Entry(0f, 10f), Entry(1f, 20f), Entry(2f, 15f),
-        Entry(3f, 30f), Entry(4f, 25f), Entry(5f, 35f)
+        Entry(3f, 30f), Entry(4f, 25f)
     )
     var lineGraphEntries = arrayListOf(
         Entry(0f, 4f), Entry(1f, 5f), Entry(2f, 11f),
@@ -27,6 +28,9 @@ object Client {
     var recordList = ArrayList<Record>()
     var pieText = "Здесь будет отображаться ваш прогресс. Пример"
     var lineText = "Здесь будет отображаться ваш прогресс. Пример"
+    val colors = arrayListOf(Color.rgb(64, 224, 208), Color.rgb(60, 179, 113),
+        Color.rgb(60, 179, 113), Color.rgb(70, 130, 180),
+        Color.rgb(169, 169, 169))
 
     /**
      * The `resetData` function resets all the data fields to their initial values.

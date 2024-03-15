@@ -14,7 +14,6 @@ import android.widget.Button
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.app.speakertrainer.constance.Constance.REQUEST_VIDEO_CAPTURE
 import com.app.speakertrainer.data.Statistics
 import com.app.speakertrainer.databinding.ActivityHomeBinding
 import com.app.speakertrainer.modules.ApiManager
@@ -37,7 +36,6 @@ import com.gowtham.library.utils.TrimVideo
 class Home : AppCompatActivity() {
     private lateinit var selectBtn: Button
     private lateinit var binding: ActivityHomeBinding
-    private val PICK_IMAGE = 100
     private var videoUri: Uri? = null
     private val apiManager = ApiManager(this)
     val startForResult =
@@ -54,6 +52,26 @@ class Home : AppCompatActivity() {
             } else
                 LogMessage.v("videoTrimResultLauncher data is null")
         }
+    val startLoadVideo = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            if (result.data != null) {
+                val selectVideo = result.data!!.data
+                videoUri = selectVideo
+                trimVideo(selectVideo.toString())
+            }
+        }
+    }
+    val startVideoRecord = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            if (result.data != null) {
+                val selectVideo = result.data!!.data
+                videoUri = selectVideo
+                trimVideo(selectVideo.toString())
+            }
+        }
+    }
 
     /**
      * Method called when the activity is created.
@@ -133,8 +151,7 @@ class Home : AppCompatActivity() {
             val colors = mutableListOf<Int>()
             // Set colors for drawing pie chart.
             for (i in entries.indices) {
-                val randomColor = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-                colors.add(randomColor)
+                colors.add(Client.colors[i])
             }
             val pieDataSet = PieDataSet(entries, "Слова паразиты")
             pieDataSet.colors = colors
@@ -182,7 +199,7 @@ class Home : AppCompatActivity() {
         val intent = Intent()
         intent.action = Intent.ACTION_PICK
         intent.type = "video/*"
-        startActivityForResult(intent, PICK_IMAGE)
+        startLoadVideo.launch(intent)
     }
 
     /**
@@ -190,7 +207,7 @@ class Home : AppCompatActivity() {
      */
     fun onClickStartRecording(view: View) {
         val takeVideoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE)
+        startVideoRecord.launch(takeVideoIntent)
     }
 
     /**
@@ -222,32 +239,6 @@ class Home : AppCompatActivity() {
                 val intent = Intent(this@Home, MainActivity::class.java)
                 startActivity(intent)
                 finish()
-            }
-        }
-    }
-
-    /**
-     * Method called when receiving the result from another activity.
-     * Handles the result based on the request code and result code.
-     *
-     * @param requestCode the request code that was originally sent when starting the activity
-     * @param resultCode the result code returned by the activity
-     * @param data the data intent passed back by the activity (may be null)
-     */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
-            if (data != null) {
-                val selectVideo = data.data
-                videoUri = selectVideo
-                trimVideo(selectVideo.toString())
-            }
-        }
-        if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                val selectVideo = data.data
-                videoUri = selectVideo
-                trimVideo(selectVideo.toString())
             }
         }
     }
