@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -14,7 +17,10 @@ class GazeDirection:
         Initialize prediction model and threshold.
         :param threshold: float value - acceptable displacement of iris.
         """
-        model_file = open('face_landmarker_v2_with_blendshapes.task', "rb")
+        current_file_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+        current_directory = os.path.dirname(current_file_path)
+        path = current_directory + '\\data\\face_landmarker_v2_with_blendshapes.task'
+        model_file = open(path, "rb")
         model_data = model_file.read()
         model_file.close()
         base_options = python.BaseOptions(model_asset_buffer=model_data)

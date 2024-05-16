@@ -9,12 +9,12 @@ class Perspective:
         Initialize model for detection.
         """
         self.detector = PoseDetector(staticMode=False,
-                                modelComplexity=1,
-                                smoothLandmarks=True,
-                                enableSegmentation=False,
-                                smoothSegmentation=True,
-                                detectionCon=0.5,
-                                trackCon=0.5)
+                                     modelComplexity=1,
+                                     smoothLandmarks=True,
+                                     enableSegmentation=False,
+                                     smoothSegmentation=True,
+                                     detectionCon=0.5,
+                                     trackCon=0.5)
 
     def point_between(self, point1, point2):
         """
@@ -47,11 +47,11 @@ class Perspective:
         optimal /= len(frames)
         bright /= len(frames)
         if dark >= optimal and dark >= bright:
-            return 'dark'
+            return 0
         elif bright >= dark and bright >= optimal:
-            return 'bright'
+            return 2
         else:
-            return 'optimal'
+            return 1
 
     def check_correct_pose(self, bounding_box, eye_coords, image_width, image_height):
         """
@@ -64,15 +64,15 @@ class Perspective:
         """
         x_center = image_width // 2
         y_third_line = image_height // 3
-        x1, y1, x2, y2 = bounding_box['bbox']
-        if abs(x1 + ((x2 - x1) / 2) - x_center) > 0.2 * image_width:
-            return 0
+        x, y, x_len, y_len = bounding_box["bbox"]
+        if abs(x + x_len / 2 - x_center) > 0.2 * x_center:
+            return False
 
         # Check eye position according rule of the third.
         eye_x, eye_y = eye_coords
         if eye_y < y_third_line - 0.15 * image_height or eye_y > y_third_line + 0.15 * image_height:
-            return 0
-        return 1
+            return False
+        return True
 
     def count_angle(self, frames):
         """
@@ -85,17 +85,19 @@ class Perspective:
         inc_index = []
         ind = 0
         for frame in frames:
-            img = self.detector.findPose(frame, draw=False)
-            lm_list, bbox_info = self.detector.findPosition(img, draw=False, bboxWithHands=False)
-            right_coords = [lm_list[5][0], lm_list[5][1]]
-            left_coords = [lm_list[2][0], lm_list[2][1]]
-            width, height, _ = frame.shape
-            if self.check_correct_pose(bbox_info, self.point_between(right_coords, left_coords), width, height) == 0:
-                inc_index.append(ind)
-            else:
-                incorrect_pose += 1
-            ind += 1
-            length = bbox_info['bbox'][2] - bbox_info['bbox'][0]
-            if length > bbox_length:
-                bbox_length = length
+            try:
+                img = self.detector.findPose(frame, draw=False)
+                lm_list, bbox_info = self.detector.findPosition(img, draw=False, bboxWithHands=False)
+                right_coords = [lm_list[5][0], lm_list[5][1]]
+                left_coords = [lm_list[2][0], lm_list[2][1]]
+                height, width = frame.shape[:2]
+                if not self.check_correct_pose(bbox_info, self.point_between(right_coords, left_coords), width, height):
+                    inc_index.append(ind)
+                    incorrect_pose += 1
+                ind += 1
+                length = bbox_info['bbox'][2] - bbox_info['bbox'][0]
+                if length > bbox_length:
+                    bbox_length = length
+            except:
+                continue
         return incorrect_pose / len(frames), bbox_length, inc_index

@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import cv2
 import mediapipe as mp
 import torchvision.transforms as transforms
@@ -98,7 +101,10 @@ class Clothes:
         """
         model = CustomResNet()
         custom_model = CustomModel(model)
-        custom_model.model.load_state_dict(torch.load('saved_model_modified.pth'))
+        current_file_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+        current_directory = os.path.dirname(current_file_path)
+        path = current_directory + '\\data\\saved_model_modified.pth'
+        custom_model.model.load_state_dict(torch.load(path))
         image = self.choose_sharpest_image(frames)
         image = self.transform_image(image)
         image = image.unsqueeze(0)

@@ -1,3 +1,6 @@
+import inspect
+import os
+
 import cv2
 from gaze import GazeDirection
 from perspective import Perspective
@@ -6,20 +9,31 @@ from clothes import Clothes
 from emotions import VideoEmotions
 from tqdm import tqdm
 from joblib import load
+import math
 
 
 class VideoSubsystem:
-    velocity_scale = {2: 'Активная жестикуляция', 1: 'Оптимальная жестикуляция', 0: 'Неактивная жестикуляция'}
     acceptable_velocity = {'right elbow': [5, 50], 'left elbow': [5, 50], 'left shoulder': [2, 25],
                            'right shoulder': [2, 25], 'left thumb': [0, 30], 'left pinky': [3, 40],
                            'right thumb': [0, 30], 'right pinky': [3, 40], 'right wrist': [3, 40],
                            'left wrist': [3, 40], 'head': [0, 12]}
 
-    def __init__(self, path, emotions=False, gesticulation=False, angle=False, gaze=False, clothes=False,
-                 device='cpu', dist=5, acceptable_angle=0.6):
-        self.fps = None
-        self.frame_height = None
-        self.frame_width = None
+    def __init__(self, path, inappropriate_emotions, emotions=True, gesticulation=True, angle=True, gaze=True, clothes=True,
+                 device='cpu', dist=5):
+        """
+        Initialize parameters.
+        :param path: path of the video to analyze.
+        :param inappropriate_emotions: list of inappropriate emotions to count percentage.
+        :param emotions: flag if analyze emotions.
+        :param gesticulation: flag if analyze gesture velocity.
+        :param angle: flag if analyze percent of incorrect perspective.
+        :param gaze: flag if analyze percent of incorrect gaze direction.
+        :param clothes: flag if analyze clothes.
+        :param device: cpu or gpu.
+        :param dist: number of frames for analyzing in one second.
+        """
+
+        self.inappropriate_emotions = inappropriate_emotions
         self.device = device
         self.video_path = path
         self.emotions = emotions
@@ -27,11 +41,88 @@ class VideoSubsystem:
         self.angle = angle
         self.gaze = gaze
         self.clothes = clothes
-        self.draw = {}
         self.dist = dist
-        self.acceptable_angle = acceptable_angle
-        self.emotion_model =load('model_first.joblib')
 
+        current_file_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+        current_directory = os.path.dirname(current_file_path)
+        path = current_directory + "\\data\\model_first.joblib"
+        self.emotion_model = load(path)
+
+        self.emotion_list = []
+        self.emotion_inappropriate_percentage = []
+        self.gesture_list = []
+        self.angle_list = []
+        self.gaze_list = []
+        self.lightning = []
+        self.angle_len = []
+        self.inc_ind = []
+        self.clothes_estimation = None
+        cap = cv2.VideoCapture(self.video_path)
+        self.fps = math.ceil(cap.get(cv2.CAP_PROP_FPS))
+        cap.release()
+
+    def get_emotions(self):
+        """
+        Get emotionality rate.
+        :return: list with emotionality rates.
+        """
+        return self.emotion_list
+
+    def get_gestures(self):
+        """
+        Get rate of gestures: 0 - low, 1 - medium, 2 - high.
+        :return: list with gesticulation rates.
+        """
+        return self.gesture_list
+
+    def get_angle(self):
+        """
+        Return percent of incorrect angle.
+        :return: list with percents for each fragment.
+        """
+        return self.angle_list
+
+    def get_gaze(self):
+        """
+        Get percent of incorrect gaze - percent of frames when speaker looks not in the center.
+        :return: list of percents for each fragment.
+        """
+        return self.gaze_list
+
+    def get_lightning(self):
+        """
+        Get flags for lightning.
+        :return: list of flags for each fragment.
+        """
+        return self.lightning
+
+    def get_angle_len(self):
+        """
+        Get length of the widest bound box of the speaker.
+        :return: list with values for each fragment.
+        """
+        return self.angle_len
+
+    def get_clothes_estimation(self):
+        """
+        Return flag for correct clothes.
+        :return: flag for clothes.
+        """
+        return self.clothes_estimation
+
+    def get_incorrect_angle_ind(self):
+        """
+        Get indices if frames when perspective is incorrect.
+        :return: list of indices for each fragment.
+        """
+        return self.inc_ind
+
+    def get_inappropriate_emotion_percentage(self):
+        """
+        Get percent of incorrect emotions.
+        :return: list of percents for each fragment.
+        """
+        return self.emotion_inappropriate_percentage
     @staticmethod
     def get_subarray(array, subset, ind):
         """
@@ -93,13 +184,11 @@ class VideoSubsystem:
             else:
                 features.append(0.0)
         res = self.emotion_model.predict([features])[0]
-        if res < 0.2:
-            self.draw['emotion'] = {'value': "Эмоциональность: не эмоционально"}
-        elif res > 0.6:
-            self.draw['emotion'] = {'value': "Эмоциональность: слишком эмоционально"}
-        else:
-            self.draw['emotion'] = {'value': "Эмоциональность: оптимально"}
-        return res
+        percent_res = 0.0
+        for element in self.inappropriate_emotions:
+            if element in percentages.keys():
+                percent_res += percentages[element]
+        return res, percent_res * 0.01
 
     def replace_values_with_condition(self, dictionary):
         """
@@ -150,7 +239,6 @@ class VideoSubsystem:
             else:
                 result.append(1)
         all_percent = VideoSubsystem.calculate_percentage(result)
-        self.draw['velocity'] = {'value': result}
         if 2 in all_percent.keys():
             return 2
         elif 0 in all_percent.keys() and all_percent[0] > 70:
@@ -167,10 +255,12 @@ class VideoSubsystem:
         model = GazeDirection()
         percent = model.gaze_detection(frames)
         percentages = VideoSubsystem.calculate_percentage(percent)
-        max_key = max(percentages, key=percentages.get)
-        if max_key != 'center':
-            self.draw['gaze'] = {'value': 'Вы часто отводите взгляд'}
-        return 1 - percentages['center']
+        # max_key = max(percentages, key=percentages.get)
+        try:
+            result = (100 - percentages['center']) * 0.01
+        except:
+            result = 1
+        return result
 
     def process_angle(self, frames):
         """
@@ -180,14 +270,8 @@ class VideoSubsystem:
         """
         perspective = Perspective()
         brightness = perspective.count_brightness(frames[::self.dist])
-        percent, length, inc_ind = perspective.count_angle(frames[::self.dist])
-        self.draw['angle'] = {'length': length, 'ind': inc_ind}
-        if brightness == 'dark':
-            self.draw['brightness'] = {'value': 'Слишком темное освещение'}
-        elif brightness == 'bright':
-            self.draw['brightness'] = {'value': 'Слишком яркое освещение'}
-        else: self.draw['brightness'] = {'value': 'Оптимальное освещение'}
-        return percent
+        percent, length, inc_ind = perspective.count_angle(frames)
+        return percent, length, brightness, inc_ind
 
     def process_clothes(self, frames):
         """
@@ -198,128 +282,44 @@ class VideoSubsystem:
         clothes = Clothes()
         return clothes.assess_appearance(frames)
 
-    def draw_angle(self, frame, length, color):
-        """
-        Draw lines for correct angle.
-        :param frame: image for drawing.
-        :param length: length of speaker's bound box.
-        :param color: red if angle is incorrect, green otherwise.
-        :return: new frame with angle lines.
-        """
-        image_orig = frame.copy()
-        height, width = frame.shape[:2]
-        center_x = width // 2
-        line_length = length // 2
-        line_thickness = 5
-        line_offset_top = height // 3 + int(0.15 * height)
-        line_offset_bottom = height // 3 - int(0.15 * height)
 
-        cv2.line(frame, (center_x - line_length, height), (center_x-line_length, 0), color, line_thickness)
-        cv2.line(frame, (center_x + line_length, height), (center_x + line_length, 0), color, line_thickness)
-        cv2.line(frame, (center_x - line_length, line_offset_top), (center_x + line_length, line_offset_top),
-                 color, line_thickness)
-        cv2.line(frame, (center_x - line_length, line_offset_bottom), (center_x + line_length, line_offset_bottom),
-                 color, line_thickness)
-        font = cv2.FONT_HERSHEY_COMPLEX
-        bottom_left_corner_text = (center_x - line_length, line_offset_top - 20)
-        font_scale = 0.5
-        font_color = color
-        line_type = 1
-        cv2.putText(frame, 'Рекомендуемый уровень глаз', bottom_left_corner_text, font, font_scale, font_color,
-                    line_type)
-        image_out = cv2.addWeighted(frame, 0.3, image_orig, 0.7, 0.0)
-        return image_out
-
-    def draw_frames(self, frames):
-        """
-        Draw results on video frames.
-        :param frames: frames for processing.
-        :return: processed frames.
-        """
-        font = cv2.FONT_HERSHEY_COMPLEX
-        x = 20
-        y = 50
-        font_scale = 1
-        thickness = 1
-        green_color = (50, 205, 50)
-        red_color = (220, 20, 60)
-        bb_length = self.draw['angle']['length']
-        inc_ind = self.draw['angle']['ind']
-        for ind in range(len(frames)):
-            count = 1
-            for key in self.draw.keys():
-                if key != 'velocity' and key != 'angle':
-                    if self.draw[key]['value'] in ['Эмоциональность: оптимально', 'Оптимальная жестикуляция',
-                                                   'Оптимальное освещение']:
-                        color = green_color
-                    else:
-                        color = red_color
-                    frames[ind] = cv2.putText(frames[ind], self.draw[key]['value'], (x, y * count), font, font_scale,
-                                              color, thickness, cv2.LINE_AA)
-                    count += 1
-                elif key == 'velocity':
-                    current_sec = int(ind // self.fps)
-                    text = VideoSubsystem.velocity_scale[self.draw[key]['value'][current_sec]]
-                    if text == 'Оптимальная жестикуляция':
-                        color = green_color
-                    else:
-                        color = red_color
-                    frames[ind] = cv2.putText(frames[ind], text,
-                                              (x, y * count), font, font_scale, color, thickness, cv2.LINE_AA)
-                    count += 1
-            if ind in inc_ind:
-                color = red_color
-            else:
-                color = green_color
-            frames[ind] = self.draw_angle(frames[ind], bb_length, color)
-        return frames
-
-    def process_video(self, output_path, duration=10):
+    def process_video(self, duration=10):
         """
         Read for duration seconds and process frames.
-        :param output_path: new path of processed video.
         :param duration: number of seconds to process in one cycle.
         :return: dictionary with results.
         """
-        result = {'emotions': [], 'gesticulation': [], 'angle': [], 'gaze': [], 'clothes': None}
         cap = cv2.VideoCapture(self.video_path)
-        self.fps = cap.get(cv2.CAP_PROP_FPS)
-        self.frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, self.fps, (self.frame_width, self.frame_height))
-        segment_duration = duration
-        segment_frame_count = int(self.fps * segment_duration)
-        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        for i in tqdm(range(0, frame_count, segment_frame_count)):
-            frames = []
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-            for j in range(segment_frame_count):
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                frames.append(frame)
-            if self.emotions:
-                res = self.process_emotions(frames)
-                result['emotions'].append(res)
-            if self.gesticulation:
-                res = self.process_gesticulation(frames)
-                result['gesticulation'].append(res)
-            if self.angle:
-                res = self.process_angle(frames)
-                result['angle'].append(res)
-            if self.gaze:
-                res = self.process_gaze(frames)
-                result['gaze'].append(res)
-            if self.clothes and result['clothes'] is None:
-                res = self.process_clothes(frames)
-                result['clothes'] = res
-            frames = self.draw_frames(frames)
-            for j in range(len(frames)):
-                out.write(frames[j])
-
-        cap.release()
-        out.release()
-        cv2.destroyAllWindows()
-        self.draw = {}
-        return result
+        try:
+            segment_duration = duration
+            segment_frame_count = math.ceil(cap.get(cv2.CAP_PROP_FPS) * segment_duration)
+            frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            for i in tqdm(range(0, frame_count, segment_frame_count)):
+                frames = []
+                cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+                for j in range(segment_frame_count):
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    frames.append(frame)
+                if self.emotions:
+                    res, percent_res = self.process_emotions(frames)
+                    self.emotion_list.append(res)
+                    self.emotion_inappropriate_percentage.append(percent_res)
+                if self.gesticulation:
+                    res = self.process_gesticulation(frames)
+                    self.gesture_list.append(res)
+                if self.angle:
+                    res, length, brightness, inc_ind = self.process_angle(frames)
+                    self.angle_list.append(res)
+                    self.angle_len.append(length)
+                    self.lightning.append(brightness)
+                    self.inc_ind.append(inc_ind)
+                if self.gaze:
+                    res = self.process_gaze(frames)
+                    self.gaze_list.append(res)
+                if self.clothes and self.clothes_estimation is None:
+                    self.clothes_estimation = self.process_clothes(frames)
+        finally:
+            cap.release()
+            cv2.destroyAllWindows()

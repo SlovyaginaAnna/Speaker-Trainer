@@ -42,24 +42,6 @@ class VideoEmotions:
         return main_face
 
     @staticmethod
-    def calculate_emotion_percentage(emotion_list):
-        """
-        Calculate percentage of each element in the list.
-        :param emotion_list: list for calculation.
-        :return: dictionary with percentages of each element.
-        """
-        total_frames = len(emotion_list)
-        emotion_percentage = {}
-        for emotion in emotion_list:
-            if emotion in emotion_percentage.keys():
-                emotion_percentage[emotion] += 1
-            else:
-                emotion_percentage[emotion] = 1
-        for emotion in emotion_percentage.keys():
-            emotion_percentage[emotion] = (emotion_percentage[emotion] / total_frames) * 100
-        return emotion_percentage
-
-    @staticmethod
     def calculate_emotion_change_frequency(emotion_list):
         """
         calculate the percentage of changing emotions between two seconds.
