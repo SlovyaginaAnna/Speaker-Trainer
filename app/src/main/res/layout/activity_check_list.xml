@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:backgroundTint="@color/blue"
+    tools:context=".activities.CheckListActivity">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="24dp"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/videoName"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/comfortaa_bold"
+            android:hint="@string/recordName"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"
+        app:layout_constraintVertical_bias="1.0" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/checkBoxAll"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/white"
+                android:text="@string/all" />
+
+            <CheckBox
+                android:id="@+id/checkBoxVisual"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/comfortaa_bold"
+                android:text="@string/allVisual"
+                android:textColor="@android:color/white" />
+
+            <CheckBox
+                android:id="@+id/checkBoxClothes"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/appearance" />
+
+            <CheckBox
+                android:id="@+id/checkBoxGesture"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/gesticulation" />
+
+            <CheckBox
+                android:id="@+id/checkBoxEye"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/gaze" />
+
+            <CheckBox
+                android:id="@+id/checkBoxAngle"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/angle" />
+
+            <CheckBox
+                android:id="@+id/checkBoxAllAudio"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/allAudio" />
+
+            <CheckBox
+                android:id="@+id/checkBoxIntelligibility"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/intelligibility" />
+
+            <CheckBox
+                android:id="@+id/checkBoxPauses"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/speechRate" />
+
+            <CheckBox
+                android:id="@+id/checkBoxParasites"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/cleanSpeech" />
+
+            <CheckBox
+                android:id="@+id/checkBoxNoise"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/noise" />
+
+            <CheckBox
+                android:id="@+id/checkBoxEmotions"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/emotionality" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bNav"
+        style="@style/bottomNavigitionViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:backgroundTint="@color/dark_blue"
+        app:itemBackground="@color/dark_blue"
+        app:itemIconTint="@drawable/button_selector"
+        app:itemTextAppearanceActiveBoldEnabled="false"
+        app:itemTextColor="@color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_three_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

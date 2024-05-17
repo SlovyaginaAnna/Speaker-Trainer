@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:backgroundTint="@color/white"
+    app:layout_gravity="center"
+    tools:context=".activities.AnalysisResults">
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bNav"
+        style="@style/bottomNavigitionViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:backgroundTint="@color/dark_blue"
+        app:itemBackground="@color/dark_blue"
+        app:itemIconTint="@drawable/button_selector"
+        app:itemTextAppearanceActiveBoldEnabled="false"
+        app:itemTextColor="@color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_three_menu" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <VideoView
+            android:id="@+id/videoView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/dark_blue" />
+    </FrameLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/bNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewName"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/comfortaa_bold"
+                android:text="Для более детального анализа нажмите на соответствующее текстовое поле"
+                android:textStyle="italic"
+                android:visibility="visible"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <TextView
+                android:id="@+id/textViewClean"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Чистота речи"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textViewFillerWords"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/comfortaa_light"
+                android:text=""
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textViewRate"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartRate"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewNoise"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartNoise"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewIntelligibility"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/comfortaa_light"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartIntelligibility"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewClothes"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textViewGestures"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartGestures"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewAngle"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartAngle"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewGlances"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartGlances"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewEmotionality"
+                style="@style/analysisResultsStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartEmotionality"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

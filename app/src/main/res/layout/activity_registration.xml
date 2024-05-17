@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".activities.RegistrationActivity">
+
+    <Button
+        android:id="@+id/authorizationButton"
+        style="@style/borderlessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/comfortaa_bold"
+        android:onClick="onClickAuthorization"
+        android:text="@string/authorizationText"
+        android:textAlignment="viewStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/registrationTextView"
+        style="@style/Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="0dp"
+        android:fontFamily="@font/comfortaa_bold"
+        android:text="@string/registrationText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/authorizationButton" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style = "TextInputLayoutStyle"
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registrationTextView">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/emailInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/comfortaa_bold"
+            android:hint="@string/enterEmail"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/dark_blue"
+            android:textColorHighlight="@color/dark_blue"
+            android:textColorHint="@color/dark_blue" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style = "TextInputLayoutStyle"
+        android:id="@+id/textInputLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="180dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/numInput"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/comfortaa_bold"
+            android:hint="Подтвердите почту"
+            android:textColor="@color/dark_blue"
+            android:textColorHighlight="@color/dark_blue"
+            android:textColorHint="@color/dark_blue" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <Button
+        android:id="@+id/button2"
+        style="@style/borderlessButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:fontFamily="@font/comfortaa_bold"
+        android:onClick="onClickSendCode"
+        android:text="Отправить код"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textInputLayout4"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+    <Button
+        android:id="@+id/registerButton"
+        style="@style/darkButton"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:onClick="onClickNext"
+        android:text="@string/registerText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

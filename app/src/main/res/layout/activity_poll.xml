@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    android:backgroundTint="@color/blue"
+    tools:context=".activities.PollActivity">
+
+    <TextView
+        android:id="@+id/textView4"
+        style="@style/checkBoxText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/fragmentLen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="@color/white"
+        android:foregroundTint="@color/white"
+        android:indeterminateTint="@color/white"
+        android:max="30"
+        android:min="3"
+        android:progressBackgroundTint="@color/white"
+        android:progressTint="@color/white"
+        android:secondaryProgressTint="@color/white"
+        android:thumbTint="@color/white"
+        android:tickMarkTint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textType"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:buttonTint="@color/white"
+                android:gravity="bottom|center_vertical"
+                android:text="@string/chooseType" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    style="@style/checkBoxText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/official" />
+
+                <Switch
+                    android:id="@+id/switch1"
+                    style="@style/checkBoxText"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/comfortaa_bold"
+                    android:switchTextAppearance="@style/SwitchText"
+                    android:textSize="15sp"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textEmotion"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:buttonTint="@color/white"
+                android:gravity="center_vertical"
+                android:text="@string/chooseEmotions"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxJoy"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/joy"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxSad"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/sadness"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkAnger"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/anger"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxSurprise"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/surprise"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxNeutral"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/neutral"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxDisguist"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/disgust"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textGesticulation"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:buttonTint="@color/white"
+                android:gravity="center_vertical"
+                android:text="@string/invalidGesture"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxNotActive"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/notActive"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxOptimal"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/optimal"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/checkBoxActive"
+                style="@style/checkBoxText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:text="@string/active"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bNav"
+        style="@style/bottomNavigitionViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:backgroundTint="@color/dark_blue"
+        app:itemBackground="@color/dark_blue"
+        app:itemIconTint="@drawable/button_selector"
+        app:itemTextAppearanceActiveBoldEnabled="false"
+        app:itemTextColor="@color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_three_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
